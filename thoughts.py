@@ -1,8 +1,27 @@
 import sqlite3
 from flask import Flask, request
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
+
+class User(object):
+	'''
+		Encrypt passwords
+	'''
+	def __init__(self, username, password):
+		self.username = username
+		self.set_password(password)
+
+	def set_password(self, password):
+		self.pw_hash = generate_password_hash(password)
+
+
 
 ########################################################
+
+# connect to database
+
 db = sqlite3.connect("data.db", check_same_thread=False)
 curr = db.cursor()
 
@@ -102,7 +121,11 @@ def login():
 				# user exists, validate password
 				print(str(type(row)) + " - " + str(row))
 				
-				if (row[2] == data.get("password")):
+				# validate hashes
+				
+				check_pass = check_password_hash(row[2], data.get("password", ""))
+
+				if (check_pass):
 					# correct password was entered
 					return "Logged in!"
 
@@ -132,12 +155,12 @@ def validate_register(reg_data):
 	for key in keys:
 		vals.append(reg_data[key])
 
+	#encrypt password
+	secure_user = User(vals[0], vals[1])
+	vals[1] = secure_user.pw_hash
 
 	return tuple(vals)
 
-
-def encrupt_pass(password):
-	return password
 
 #### run app
 if __name__ == '__main__':
