@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -62,7 +62,7 @@ def home():
 @app.route('/register/', methods=['GET'])
 def register_serve():
 	# curr.execute("INSERT INTO users(username, email, password, reg_date) VALUES('captainmoha', 'farouk@thoughts.com', '1234', '15th NOV 2017')")
-	return "Welcome to thoughts, please register."
+	return render_template('register.html')
 
 
 @app.route('/register/', methods=['POST'])
@@ -95,7 +95,8 @@ def register():
 
 @app.route('/login/', methods=['GET'])
 def login_serve():
-	return "Please login"
+
+	return render_template("login.html")
 
 
 
