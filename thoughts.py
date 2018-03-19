@@ -103,7 +103,7 @@ def login_serve():
 
 @app.route('/login/', methods=['POST'])
 def login():
-	data = request.get_json()
+	data = request.form
 
 	username = ""
 
