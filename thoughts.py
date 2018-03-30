@@ -67,7 +67,11 @@ def register_serve():
 
 @app.route('/register/', methods=['POST'])
 def register():
-	data = request.json
+
+	'''
+		Handle post request from front-end Login a user
+	'''
+	data = request.form
 
 	if (data != None):
 		print("----: " + str(data))
@@ -90,6 +94,8 @@ def register():
 					return "already registered" 
 		else:
 			return "incomplete data"
+	else:
+		return "Invalid request"
 
 
 
@@ -103,6 +109,10 @@ def login_serve():
 
 @app.route('/login/', methods=['POST'])
 def login():
+
+	'''
+		Handle post request from front-end Register a user
+	'''
 	data = request.form
 
 	username = ""
@@ -142,19 +152,26 @@ def login():
 
 
 def validate_register(reg_data):
+
+	'''
+		Validate registration form
+	'''
 	keys = ['username', 'password', 'email', 'name']
 	vals = []
 
 	print("validate----- " +  str(type(reg_data)))
-	for key, val in reg_data.items():
-		if (key in keys and val != ""):
-			continue
-		else:
-			return None
+	
 
 
 	for key in keys:
-		vals.append(reg_data[key])
+		val = reg_data.get(key, None)
+
+		if (val):
+			vals.append(val)
+
+	# make sure that all 4 essential fields are filled
+	if (len(vals) != 4):
+		return None
 
 	#encrypt password
 	secure_user = User(vals[0], vals[1])
