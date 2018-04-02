@@ -23,7 +23,7 @@ class User(object):
 ########################################################
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ['T_KEY']
 
 # things to do before and after a request
 
