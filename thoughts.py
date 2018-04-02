@@ -95,6 +95,18 @@ def logout():
 	return redirect(url_for('home'))
 
 
+@app.route('/<username>/')
+def profile(username):
+
+	user = get_user_by_name(username)
+
+	if (user and len(user) > 0):
+		get_profile(user[0])
+		return "This is {}'s profile".format(username)
+
+	return "Nothing here"
+
+
 #### run app
 if __name__ == '__main__':
 	app.run(debug=True)

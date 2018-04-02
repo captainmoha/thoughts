@@ -31,6 +31,14 @@ def get_user_by_id(id):
 	
 	return row
 
+def get_profile(id):
+
+	get_user_by_id(id)
+
+
+
+
+
 
 def register_user(data):
 
@@ -47,6 +55,10 @@ def register_user(data):
 
 			if (row == None):
 				g.db_cursor.execute("INSERT INTO users(username, password, email, name) VALUES(?, ?, ?, ?)", reg_data)
+
+				user_id = g.db_cursor.lastrowid
+				print("userid "  + str(user_id))
+				g.db_cursor.execute("INSERT INTO profiles(user_id) VALUES(?)", str(user_id))
 				g.db.commit()
 				return redirect(url_for('login'))
 
