@@ -33,7 +33,7 @@ app.secret_key = os.urandom(24)
 def before_request():
 
 	# connect to database
-	g.db = sqlite3.connect("data.db", check_same_thread=False)
+	g.db = sqlite3.connect("mrdata.db", check_same_thread=False)
 	g.db_cursor = g.db.cursor()
 
 	# handle session
