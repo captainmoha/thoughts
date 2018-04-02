@@ -1,5 +1,6 @@
 import sqlite3
-from flask import Flask, request, render_template
+import os
+from flask import Flask, request, render_template, session, url_for, redirect, g
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -18,59 +19,59 @@ class User(object):
 
 
 
-########################################################
-
-# connect to database
-
-db = sqlite3.connect("data.db", check_same_thread=False)
-curr = db.cursor()
-
-
-# curr.execute('''
-# 	CREATE TABLE users
-# 	(id integer PRIMARY KEY, username text UNIQUE NOT NULL,
-#    	email text UNIQUE NOT NULL, password text NOT NULL,
-#    	name text NOT NULL,
-
-# 	reg_date DATETIME DEFAULT CURRENT_TIMESTAMP
-# 	)
-# 	''')
-
-
-# curr.execute('''
-# 	CREATE TABLE profiles
-# 	(id integer AUTO INCREMENT, username text UNIQUE NOT NULL, name text NOT NULL, birthday text,
-# 	phone_number text, about text,
-
-# 	FOREIGN KEY(username) REFERENCES users(username)
-# 	)
-# 	''')
-
-# db.commit()
-
 
 ########################################################
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
+
+# things to do before and after a request
+
+########################################################
+
+@app.before_request
+def before_request():
+
+	# connect to database
+	g.db = sqlite3.connect("data.db", check_same_thread=False)
+	g.db_cursor = g.db.cursor()
+
+	# handle session
+	g.usr = None
+	if 'usr' in session:
+		g.usr = session['usr']
+
+@app.teardown_request
+def teardown_request(exception):
+	
+	# close database
+	g.db.close()
+
+
+########################################################
 
 
 @app.route('/')
 def home():
-	return "I AM HOME"
+	if g.usr:
+		# get in, later will show home page
+		return "Logged in as {}".format(session['usr'])
+
+	return render_template('login.html')
 
 
-@app.route('/register/', methods=['GET'])
-def register_serve():
-	# curr.execute("INSERT INTO users(username, email, password, reg_date) VALUES('captainmoha', 'farouk@thoughts.com', '1234', '15th NOV 2017')")
-	return render_template('register.html')
-
-
-@app.route('/register/', methods=['POST'])
+@app.route('/register/', methods=['GET', 'POST'])
 def register():
+	
+	if request.method == 'GET':
+		if g.usr:
+			return redirect(url_for('home'))
 
-	'''
-		Handle post request from front-end Login a user
-	'''
+		return render_template('register.html')
+
+	
+	# Handle post request from front-end Login a user
+
 	data = request.form
 
 	if (data != None):
@@ -82,13 +83,14 @@ def register():
 			email = data.get("email", "")
 			if (username != "" and email != ""):
 
-				curr.execute("SELECT username, email, password FROM users WHERE username = ? OR email = ? ", (username, email))
-				row = curr.fetchone()
+				g.db_cursor.execute("SELECT username, email, password FROM users WHERE username = ? OR email = ? ", (username, email))
+				row = g.db_cursor.fetchone()
 				print("reg------ " + str(row))
 				if (row == None):
-					curr.execute("INSERT INTO users(username, password, email, name) VALUES(?, ?, ?, ?)", reg_data)
-					db.commit()
-					return "Welcome to thoughts, you're signed up :D"
+					g.db_cursor.execute("INSERT INTO users(username, password, email, name) VALUES(?, ?, ?, ?)", reg_data)
+					g.db.commit()
+
+					return redirect(url_for('login'))
 	
 				else:
 					return "already registered" 
@@ -99,20 +101,18 @@ def register():
 
 
 
-@app.route('/login/', methods=['GET'])
-def login_serve():
-
-	return render_template("login.html")
-
-
-
-
-@app.route('/login/', methods=['POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
 
-	'''
-		Handle post request from front-end Register a user
-	'''
+
+	if request.method == 'GET':
+
+		if g.usr:
+			return redirect(url_for('home')) 
+
+		return render_template("login.html")
+
+
 	data = request.form
 
 	username = ""
@@ -124,8 +124,8 @@ def login():
 		if (username != None and username != ''):
 
 			# check if user exists in the database
-			curr.execute("SELECT username, email, password FROM users WHERE username = ?", (username,))
-			row = curr.fetchone()
+			g.db_cursor.execute("SELECT id, username, email, password FROM users WHERE username = ?", (username,))
+			row = g.db_cursor.fetchone()
 
 
 			if (row != None and len(row) > 0):
@@ -134,11 +134,12 @@ def login():
 				
 				# validate hashes
 				
-				check_pass = check_password_hash(row[2], data.get("password", ""))
+				check_pass = check_password_hash(row[3], data.get("password", ""))
 
 				if (check_pass):
 					# correct password was entered
-					return "Logged in!"
+					session['usr'] = row[0]
+					return redirect(url_for('home'))
 
 				else:
 					return "wrong password"
@@ -150,6 +151,13 @@ def login():
 	
 	return "Invalid request"
 
+
+# TO DO: REMOVE GET
+@app.route('/logout/', methods=['POST', 'GET'])
+def logout():
+	session.pop('usr', None)
+	return redirect(url_for('home'))
+	
 
 def validate_register(reg_data):
 
@@ -180,12 +188,7 @@ def validate_register(reg_data):
 	return tuple(vals)
 
 
+
 #### run app
 if __name__ == '__main__':
 	app.run(debug=True)
-
-
-
-
-# db.commit()
-# db.close()
