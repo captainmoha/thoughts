@@ -1,6 +1,6 @@
 from flask import render_template, session, url_for, redirect, g
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import json
 
 class User(object):
 	'''
@@ -18,7 +18,6 @@ def get_user_by_name(username):
 
 	g.db_cursor.execute("SELECT id, username, email, password, reg_date FROM users WHERE username = ? ", (username,))
 	row = g.db_cursor.fetchone()
-	print("usr------ " + str(row))
 	
 	return row
 
@@ -29,15 +28,24 @@ def get_user_by_id(id):
 	row = g.db_cursor.fetchone()
 	print("usr_id------ " + str(row))
 	
-	return row
+	return dict(row)
 
 def get_profile(id):
 
-	get_user_by_id(id)
+	sql_statment = '''SELECT id, username, name, reg_date,
+					birthday, phone_number, about, img,
+					n_likes, n_follower, n_following
+					FROM users JOIN profiles ON users.id = profiles.user_id
+					WHERE users.id = ?
+				'''
+
+	row = g.db_cursor.execute(sql_statment, (id,)).fetchone()
+	return json.dumps(dict(row))
 
 
 
-
+def update_profile(id):
+	pass
 
 
 def register_user(data):

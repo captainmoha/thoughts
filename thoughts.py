@@ -20,6 +20,7 @@ def before_request():
 
 	# connect to database
 	g.db = sqlite3.connect("mrdata.db", check_same_thread=False)
+	g.db.row_factory = sqlite3.Row
 	g.db_cursor = g.db.cursor()
 
 	# handle session
@@ -101,9 +102,8 @@ def profile(username):
 	user = get_user_by_name(username)
 
 	if (user and len(user) > 0):
-		get_profile(user[0])
-		return "This is {}'s profile".format(username)
-
+		return get_profile(user[0])
+		
 	return "Nothing here"
 
 
