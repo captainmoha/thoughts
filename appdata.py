@@ -40,7 +40,7 @@ def get_profile(id):
 				'''
 
 	row = g.db_cursor.execute(sql_statment, (id,)).fetchone()
-	return json.dumps(dict(row))
+	return row
 
 
 

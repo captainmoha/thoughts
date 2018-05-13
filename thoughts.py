@@ -102,7 +102,7 @@ def logout():
 @app.route('/<username>/')
 def profile(username):
 
-	user = get_user_by_name(username)
+	user = get_profile(g.usr)
 
 	if (user and len(user) > 0):
 
@@ -112,7 +112,9 @@ def profile(username):
 			loggedin = True
 
 		thoughts = get_thoughts_by_id(user[0])
-		return render_template("profile.html", thoughts=thoughts, loggedin=loggedin, username=username, img_url="https://avatars2.githubusercontent.com/u/6375633?s=88&v=4")
+		print(type(user))
+		print("pic " + user[7])
+		return render_template("profile.html", thoughts=thoughts, loggedin=loggedin, username=username, img_url=user[7])
 
 		return get_profile(user[0])
 		
@@ -121,27 +123,26 @@ def profile(username):
 
 @app.route('/upload/',methods=['POST'])
 def upload():
-	pic_data = request.json
-	user_name = pic_data.get("username"," ")
+	pic_data = request.form
+	
 
-	if (user_name != ""):
-		row = get_user_by_name(user_name)
-		val = pic_data.get("type","")
-		link = pic_data.get("link")
-		print(link)
-		print(len(link))
+	
+	
+	val = pic_data.get("type","")
+	link = pic_data.get("link")
+	print(link)
+	print(len(link))
 
-		if(val == "p"):
-			g.db_cursor.execute("UPDATE profiles SET img = ? WHERE user_id = ?", (str(link),row[0]))
-			g.db.commit()
-
-		elif (val == "t"):
-			# g.db_cursor.execute("INSERT INTO thoughts(img) VALUES(?)", str(link))
-			pass
-		else:
-			return "Invalid req"
+	if(val == "p"):
+		g.db_cursor.execute("UPDATE profiles SET img = ? WHERE user_id = ?", (str(link),g.usr))
+		g.db.commit()
+		return "Upload Success"
+	elif (val == "t"):
+		# g.db_cursor.execute("INSERT INTO thoughts(img) VALUES(?)", str(link))
+		pass
 	else:
-		return "invalid req!"
+		return "Invalid req"
+	
 
 @app.route('/thought/', methods=['POST'])
 def thought():

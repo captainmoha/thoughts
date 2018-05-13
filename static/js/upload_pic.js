@@ -40,7 +40,16 @@ $("document").ready(function() {
       // Response contains stringified JSON
       // Image URL available at response.data.link
       $.ajax(settings).done(function(response) {
-        console.log(response);
+        console.log("about to upload\n" + JSON.parse(response).data.link)
+        $.post("/upload/",
+        {
+            type: "p",
+            link: JSON.parse(response).data.link
+        },
+
+        function(data, status){
+            console.log("Data: " + data + "\nStatus: " + status);
+        }); 
       });
 
     }
