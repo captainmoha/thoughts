@@ -96,6 +96,7 @@ def login_user(data):
 			if (check_pass):
 				# correct password was entered
 				session['usr'] = row[0]
+				session['username'] = row[1]
 				return redirect(url_for('home'))
 
 			else:
@@ -135,3 +136,22 @@ def validate_reg_data(reg_data):
 	vals[1] = secure_user.pw_hash
 
 	return tuple(vals)
+
+
+def get_thoughts_by_id(userid):
+	pass
+	# sql_statment = '''SELECT id, username, name, reg_date,
+	# 				birthday, phone_number, about, img,
+	# 				n_likes, n_follower, n_following
+	# 				FROM users JOIN profiles ON users.id = profiles.user_id
+	# 				WHERE users.id = ?
+	# 			'''
+
+	# row = g.db_cursor.execute(sql_statment, (id,)).fetchone()
+	# return json.dumps(dict(row))
+
+
+def add_thought(txt):
+	print(g.usr)
+	g.db_cursor.execute("INSERT INTO thoughts(user_id, txt) VALUES(?, ?)", (g.usr, txt))
+	g.db.commit()

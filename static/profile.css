@@ -1,0 +1,53 @@
+.image{
+    border-color: floralwhite;
+    border-width: 5px;
+    border-style: hidden;
+    border-radius: 20%;
+    width: 250px;
+    height: 250px;
+  }
+.image-tweet{
+    border-color: floralwhite;
+    border-width: 5px;
+    border-style: hidden;
+    border-radius: 20%;
+    width: 30px;
+    height: 30px;
+  }
+.ctn{
+    min-height: 150px;
+    min-width: 150px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle
+}
+hr{
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+.p{
+    font-size: 50px;
+}
+
+.tweet_meta {
+    font-size: 30;
+}
+
+.tweet{
+    border: 3px dashed #2F2342;
+    text-align: center;
+}
+.color{
+    color: white;
+    font-weight: bold;
+}
+
+.btn-upload {
+    margin-left: 80px;
+}
