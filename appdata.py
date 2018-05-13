@@ -139,16 +139,11 @@ def validate_reg_data(reg_data):
 
 
 def get_thoughts_by_id(userid):
-	pass
-	# sql_statment = '''SELECT id, username, name, reg_date,
-	# 				birthday, phone_number, about, img,
-	# 				n_likes, n_follower, n_following
-	# 				FROM users JOIN profiles ON users.id = profiles.user_id
-	# 				WHERE users.id = ?
-	# 			'''
 
-	# row = g.db_cursor.execute(sql_statment, (id,)).fetchone()
-	# return json.dumps(dict(row))
+	rows = g.db_cursor.execute("SELECT txt FROM thoughts WHERE user_id = ? ORDER BY id DESC", (userid,)).fetchall()
+	print rows
+	return rows
+	
 
 
 def add_thought(txt):

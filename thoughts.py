@@ -111,7 +111,8 @@ def profile(username):
 		if g.usr:
 			loggedin = True
 
-		return render_template("profile.html", loggedin=loggedin, username=username, img_url="https://avatars2.githubusercontent.com/u/6375633?s=88&v=4")
+		thoughts = get_thoughts_by_id(user[0])
+		return render_template("profile.html", thoughts=thoughts, loggedin=loggedin, username=username, img_url="https://avatars2.githubusercontent.com/u/6375633?s=88&v=4")
 
 		return get_profile(user[0])
 		

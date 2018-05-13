@@ -8,7 +8,8 @@ function add(event) {
     		},
 
     		function(data, status){
-    		    alert("Data: " + data + "\nStatus: " + status);
+                location.reload();
+    		    console("Data: " + data + "\nStatus: " + status);
     		}); 
 
 	}, "Add new Thought");
